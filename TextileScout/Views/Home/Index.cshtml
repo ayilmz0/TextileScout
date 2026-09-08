@@ -1,8 +1,36 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<TextileScout.Web.Models.Product>
+@{
+    ViewData["Title"] = "TextileScout Paneli";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <h2 class="mb-4">TextileScout - Yeni Modeller</h2>
+
+    <!-- Tarama Başlatma Formu -->
+    <div class="card p-3 mb-4 bg-light">
+        <form asp-action="RunScraper" method="post" class="d-flex gap-2">
+            <input type="text" name="targetUrl" class="form-control" placeholder="Taranacak web sitesi linki (Örn: https://www.zara.com/tr/)" required />
+            <button type="submit" class="btn btn-primary">Tarama Başlat</button>
+        </form>
+    </div>
+
+    <!-- Modelleri Listeleme -->
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@item.ImageUrl" class="card-img-top" alt="Model" style="height: 300px; object-fit: cover;">
+                    <div class="card-body">
+                        <small class="text-muted">Kaynak: @item.SourceSite</small><br />
+                        <small class="text-muted">Tarih: @item.DetectedAt.ToString("g")</small>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                        <button class="btn btn-sm btn-success">Beğen</button>
+                        <button class="btn btn-sm btn-danger">Çöpe At</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
