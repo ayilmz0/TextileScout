@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHostedService<TextileScout.Web.Services.AutoScraperBackgroundService>();
+
 builder.Services.AddScoped<TextileScout.Web.Services.ScraperService>();
 
 // Add services to the container.
