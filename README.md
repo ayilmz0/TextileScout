@@ -8,7 +8,7 @@ ModaRadar, tekstil üreticileri ve e-ticaret markaları için geliştirilmiş **
 
 ## 🛠️ Teknolojik Mimari (Tech Stack)
 
-### **Backend (.NET 9 / ASP.NET Core MVC)**
+### **Backend (.NET 10 / ASP.NET Core MVC)**
 * **Mimari:** Katmanlı Mimari, Arka Plan Servis (Worker) Mimarisi
 * **Veritabanı & ORM:** Entity Framework Core, MS SQL Server
 * **Kimlik Doğrulama:** JWT + HttpOnly Cookie-based Authentication
