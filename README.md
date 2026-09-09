@@ -2,7 +2,7 @@
 
 > **Tekstil ve Moda Sektörü İçin Otomatik Rakip/Trend İzleme ve Yapay Zeka Destekli Filtreleme Platformu**
 
-ModaRadar, tekstil üreticileri ve e-ticaret markaları için geliştirilmiş **otomatik bir görsel istihbarat sistemidir**. Belirlenen hedef rakip siteleri arka planda düzenli olarak tarar, yeni eklenen ürün görsellerini toplar ve entegre **YOLOv8 Vision API** servisi ile reklam banner'ı, logo veya tekstil dışı görselleri eleyerek yalnızca gerçek kıyafet/model fotoğraflarını onay panelinize aktarır.
+TextileScout, tekstil üreticileri ve e-ticaret markaları için geliştirilmiş **otomatik bir görsel istihbarat sistemidir**. Belirlenen hedef rakip siteleri arka planda düzenli olarak tarar, yeni eklenen ürün görsellerini toplar ve entegre **YOLOv8 Vision API** servisi ile reklam banner'ı, logo veya tekstil dışı görselleri eleyerek yalnızca gerçek kıyafet/model fotoğraflarını onay panelinize aktarır.
 
 ---
 
