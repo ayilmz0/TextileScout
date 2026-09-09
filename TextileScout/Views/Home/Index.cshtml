@@ -1,36 +1,113 @@
-﻿@model IEnumerable<TextileScout.Web.Models.Product>
+﻿@model TextileScout.Web.DTOs.ProductListViewModel
 @{
-    ViewData["Title"] = "TextileScout Paneli";
+    ViewData["Title"] = "Yeni Modeller";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">TextileScout - Yeni Modeller</h2>
+<!-- MİKRO ETKİLEŞİMLİ MODERN FİLTRE ÇUBUĞU (z-index DÜZELTİLDİ) -->
+<div class="ts-card p-3 mb-4 position-relative" style="z-index: 1050; overflow: visible;">
+    <form method="get" id="filterForm" class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
 
-    <!-- Tarama Başlatma Formu -->
-    <div class="card p-3 mb-4 bg-light">
-        <form asp-action="RunScraper" method="post" class="d-flex gap-2">
-            <input type="text" name="targetUrl" class="form-control" placeholder="Taranacak web sitesi linki (Örn: https://www.zara.com/tr/)" required />
-            <button type="submit" class="btn btn-primary">Tarama Başlat</button>
-        </form>
-    </div>
+        <!-- Sol: Başlık ve Model Sayısı -->
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: -0.3px;">Gelen Modeller</h5>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 font-monospace ms-1" style="font-size: 0.75rem;">
+                @Model.Products.Count() Gösteriliyor
+            </span>
+        </div>
 
-    <!-- Modelleri Listeleme -->
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@item.ImageUrl" class="card-img-top" alt="Model" style="height: 300px; object-fit: cover;">
-                    <div class="card-body">
-                        <small class="text-muted">Kaynak: @item.SourceSite</small><br />
-                        <small class="text-muted">Tarih: @item.DetectedAt.ToString("g")</small>
-                    </div>
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
-                        <button class="btn btn-sm btn-success">Beğen</button>
-                        <button class="btn btn-sm btn-danger">Çöpe At</button>
-                    </div>
-                </div>
+        <!-- Sağ: Buton Tipi Filtreler -->
+        <div class="d-flex align-items-center gap-2 flex-wrap position-relative" style="z-index: 1051;">
+
+            <!-- Marka Seçimi (Dropdown) -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light border fw-semibold dropdown-toggle rounded-3 px-3 py-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-building text-muted"></i>
+                    <span>@(string.IsNullOrEmpty(Model.SelectedSite) ? "Tüm Markalar" : Model.SelectedSite)</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" style="min-width: 200px; z-index: 1060;">
+                    <li>
+                        <a class="dropdown-menu-item @(string.IsNullOrEmpty(Model.SelectedSite) ? "active-item" : "")" href="?site=&timeRange=@Model.TimeRange">
+                            <i class="bi bi-grid-fill me-2"></i>Tüm Markalar
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider opacity-50"></li>
+                    @foreach (var s in Model.AvailableSites)
+                    {
+                        <li>
+                            <a class="dropdown-menu-item @(Model.SelectedSite == s ? "active-item" : "")" href="?site=@s&timeRange=@Model.TimeRange">
+                                <i class="bi bi-tag-fill me-2 text-muted"></i>@s
+                            </a>
+                        </li>
+                    }
+                </ul>
             </div>
-        }
-    </div>
+
+            <!-- Zaman Aralığı (Hap/Segmented Button) -->
+            <div class="bg-light p-1 rounded-3 border d-flex gap-1">
+                <a href="?site=@Model.SelectedSite&timeRange=all"
+                   class="time-pill @(Model.TimeRange == "all" || string.IsNullOrEmpty(Model.TimeRange) ? "active" : "")">
+                    Tümü
+                </a>
+                <a href="?site=@Model.SelectedSite&timeRange=24h"
+                   class="time-pill @(Model.TimeRange == "24h" ? "active" : "")">
+                    <i class="bi bi-lightning-charge-fill me-1"></i>Son 24s
+                </a>
+                <a href="?site=@Model.SelectedSite&timeRange=7d"
+                   class="time-pill @(Model.TimeRange == "7d" ? "active" : "")">
+                    Son 7 Gün
+                </a>
+            </div>
+
+        </div>
+    </form>
 </div>
+
+<!-- FİLTRE CSS STİLLERİ -->
+<style>
+    /* Zaman Butonları (Segmented Control) */
+    .time-pill {
+        padding: 5px 12px;
+        font-size: 0.825rem;
+        font-weight: 600;
+        color: #64748B;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .time-pill:hover {
+            color: #0F172A;
+        }
+
+        .time-pill.active {
+            background: #FFFFFF;
+            color: #2563EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+    /* Dropdown Eleman Stilleri */
+    .dropdown-menu-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #334155;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 0.15s ease;
+    }
+
+        .dropdown-menu-item:hover {
+            background: #F1F5F9;
+            color: #2563EB;
+        }
+
+        .dropdown-menu-item.active-item {
+            background: rgba(37, 99, 235, 0.08);
+            color: #2563EB;
+            font-weight: 600;
+        }
+</style>

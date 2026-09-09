@@ -1,0 +1,43 @@
+﻿@model TextileScout.Web.DTOs.LoginDto
+@{
+    Layout = "_Layout"; ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="ts-card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="ts-brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                    <i class="bi bi-radar"></i>
+                </div>
+                <h5 class="fw-bold mb-1">TextileScout</h5>
+                <p class="text-muted small mb-0">Devam etmek için giriş yapın</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger border-0 rounded-3 small py-2 mb-3">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Kullanıcı Adı</label>
+                    <input asp-for="Username" class="form-control ts-input" placeholder="admin" required />
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-muted">Şifre</label>
+                    <input asp-for="Password" type="password" class="form-control ts-input" placeholder="••••••" required />
+                </div>
+                <button type="submit" class="ts-btn-primary w-100 py-2">
+                    Giriş Yap
+                </button>
+            </form>
+            <div class="text-center mt-4">
+                <a asp-action="Register" class="text-decoration-none small text-muted">Hesabınız yok mu? <b class="text-primary">Hemen Kayıt Olun</b></a>
+            </div>
+        </div>
+    </div>
+</div>
+

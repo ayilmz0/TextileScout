@@ -7,52 +7,80 @@ namespace TextileScout.Web.Services
     public class AutoScraperBackgroundService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IWebHostEnvironment _env;
+        private readonly ILogger<AutoScraperBackgroundService> _logger;
 
-        public AutoScraperBackgroundService(IServiceProvider serviceProvider)
+        public AutoScraperBackgroundService(
+            IServiceProvider serviceProvider,
+            IWebHostEnvironment env,
+            ILogger<AutoScraperBackgroundService> logger)
         {
             _serviceProvider = serviceProvider;
+            _env = env;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Uygulama açık olduğu sürece döngü devam eder
+            _logger.LogInformation("AutoScraper Arka Plan Servisi Başlatıldı.");
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = _serviceProvider.CreateScope())
+                try
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    var scraper = scope.ServiceProvider.GetRequiredService<ScraperService>();
-
-                    // Sadece aktif olan hedef siteleri getir
-                    var activeSites = await context.TargetSites.Where(s => s.IsActive).ToListAsync();
-
-                    foreach (var site in activeSites)
+                    using (var scope = _serviceProvider.CreateScope())
                     {
-                        var scrapedItems = await scraper.ScrapeWebsiteAsync(site.Url);
+                        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                        var scraper = scope.ServiceProvider.GetRequiredService<ScraperService>();
+                        var visionApi = scope.ServiceProvider.GetRequiredService<VisionApiService>();
 
-                        foreach (var item in scrapedItems)
+                        var activeSites = await context.TargetSites.Where(s => s.IsActive).ToListAsync();
+
+                        foreach (var site in activeSites)
                         {
-                            // MÜKERRER KONTROLÜ: Aynı resim URL'si veritabanında daha önce yoksa YENİ ÜRÜN olarak ekle
-                            bool exists = await context.Products.AnyAsync(p => p.ImageUrl == item.ImageUrl);
-                            if (!exists)
-                            {
-                                context.Products.Add(new Product
-                                {
-                                    ImageUrl = item.ImageUrl,
-                                    LocalImagePath = item.ImageUrl,
-                                    SourceSite = site.Name,
-                                    DetectedAt = DateTime.Now,
-                                    Status = "InReview"
-                                });
-                            }
-                        }
+                            _logger.LogInformation("{SiteName} taranıyor...", site.Name);
+                            var scrapedItems = await scraper.ScrapeWebsiteAsync(site.Url);
 
-                        site.LastScrapedAt = DateTime.Now;
-                        await context.SaveChangesAsync();
+                            foreach (var item in scrapedItems)
+                            {
+                                bool exists = await context.Products.AnyAsync(p => p.ImageUrl == item.ImageUrl);
+                                if (exists) continue;
+
+                                var fullPath = Path.Combine(_env.WebRootPath, item.ImageUrl.TrimStart('/'));
+                                bool isClothing = await visionApi.IsClothingImageAsync(fullPath);
+
+                                if (isClothing)
+                                {
+                                    // AutoScraperBackgroundService.cs içinde ürün ekleme bloğu:
+                                    context.Products.Add(new Product
+                                    {
+                                        ImageUrl = item.ImageUrl,
+                                        LocalImagePath = item.ImageUrl,
+                                        SourceSite = site.Name,
+                                        DetectedAt = DateTime.Now,
+                                        IsApproved = false,
+                                        Status = "InReview",
+                                        UserId = site.UserId // SİTENİN SAHİBİ OLAN KULLANICIYA ATANDI
+                                    });
+                                    _logger.LogInformation("Yeni Kıyafet Eklendi: {SiteName} -> {Url}", site.Name, item.ImageUrl);
+                                }
+                                else
+                                {
+                                    if (File.Exists(fullPath)) File.Delete(fullPath);
+                                    _logger.LogWarning("Tekstil Dışı Resim Elendi & Silindi: {Url}", item.ImageUrl);
+                                }
+                            }
+
+                            site.LastScrapedAt = DateTime.Now;
+                            await context.SaveChangesAsync();
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Arka plan tarama döngüsünde bir hata oluştu!");
+                }
 
-                // 1 saat bekle, ardından tekrar tara (Test için zamanı düşürebilirsiniz)
                 await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }

@@ -1,0 +1,77 @@
+﻿@model TextileScout.Web.DTOs.ProductListViewModel
+@{
+    ViewData["Title"] = "Beğenilen Modeller";
+}
+
+<div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+        <h4 class="fw-bold mb-1" style="letter-spacing: -0.5px;">Beğenilen Modeller</h4>
+        <p class="text-muted small mb-0">Üretime/Takibe alınan kayıtlı modeller</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Model.Products üzerinden dönüyoruz -->
+    @foreach (var item in Model.Products)
+    {
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="ts-card ts-card-hover h-100 d-flex flex-column">
+                <div class="position-relative">
+                    <img src="@item.ImageUrl" class="w-100" style="height: 320px; object-fit: cover;" alt="Model">
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-success backdrop-blur rounded-2 px-2 py-1 fw-normal" style="font-size: 0.75rem;">
+                        <i class="bi bi-heart-fill me-1"></i> @item.SourceSite
+                    </span>
+                </div>
+                <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between">
+                    <div class="text-muted mb-3 d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                        <i class="bi bi-clock"></i> @item.DetectedAt.ToString("dd MMM HH:mm")
+                    </div>
+                    <div>
+                        <!-- SİL BUTONU -->
+                        <form asp-action="DeleteProduct" method="post" class="m-0">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="returnUrl" value="/Home/Approved" />
+                            <button type="submit" class="btn btn-light text-danger border rounded-3 w-100 py-2 btn-sm d-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-trash"></i> Listeden Sil
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Products.Any())
+    {
+        <div class="col-12">
+            <div class="ts-card p-5 text-center my-4">
+                <div class="ts-brand-icon mx-auto mb-3 bg-light text-muted" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h6 class="fw-bold mb-1">Henüz Beğenilen Model Yok</h6>
+                <p class="text-muted small mb-0">Gelen modeller akışından beğendiğiniz ürünler burada listelenir.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- BEĞENİLENLER SAYFALAMA (PAGINATION) -->
+@if (Model.TotalPages > 1)
+{
+    <nav class="d-flex justify-content-center mt-5">
+        <ul class="pagination pagination-sm gap-1">
+            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                <a class="page-link rounded-2 border-0 shadow-sm" href="?page=@(Model.CurrentPage - 1)">Önceki</a>
+            </li>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link rounded-2 border-0 shadow-sm" href="?page=@i">@i</a>
+                </li>
+            }
+            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                <a class="page-link rounded-2 border-0 shadow-sm" href="?page=@(Model.CurrentPage + 1)">Sonraki</a>
+            </li>
+        </ul>
+    </nav>
+}

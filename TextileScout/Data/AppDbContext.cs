@@ -9,5 +9,6 @@ namespace TextileScout.Web.Data
 
         public DbSet<Product> Products { get; set; }
         public DbSet<TargetSite> TargetSites { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

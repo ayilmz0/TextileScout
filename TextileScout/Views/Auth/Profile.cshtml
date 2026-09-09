@@ -1,0 +1,33 @@
+﻿@model TextileScout.Web.Models.User
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="ts-card p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="ts-brand-icon" style="width: 56px; height: 56px; font-size: 1.5rem;"><i class="bi bi-person"></i></div>
+                <div>
+                    <h5 class="fw-bold mb-0">@Model.Username</h5>
+                    <span class="badge bg-light text-dark border">@Model.Role Hesabı</span>
+                </div>
+            </div>
+
+            <div class="row g-3 text-center mb-4">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="fs-4 fw-bold text-primary">@ViewBag.SiteCount</div>
+                        <div class="small text-muted">Takip Edilen Site</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="fs-4 fw-bold text-success">@ViewBag.ProductCount</div>
+                        <div class="small text-muted">Yakalanan Model</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
