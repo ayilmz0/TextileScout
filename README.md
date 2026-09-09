@@ -1,4 +1,4 @@
-# 🛰️ ModaRadar (TextileScout)
+# 🛰️ TextileScout
 
 > **Tekstil ve Moda Sektörü İçin Otomatik Rakip/Trend İzleme ve Yapay Zeka Destekli Filtreleme Platformu**
 
