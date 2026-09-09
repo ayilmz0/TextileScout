@@ -30,8 +30,8 @@ namespace TextileScout.Web.Controllers
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
 
-            // Basit doğrulama (Gelişmiş projelerde Hashing kullanılır)
-            if (user != null && user.PasswordHash == dto.Password)
+            // BCRYPT ŞİFRE DOĞRULAMA
+            if (user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             {
                 var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Username, user.Role);
                 var refreshToken = _tokenService.GenerateRefreshToken();
@@ -69,10 +69,13 @@ namespace TextileScout.Web.Controllers
                 return View();
             }
 
+            // BCRYPT İLE ŞİFREYİ HASHLEME (Tuzlama/Salting otomatik yapılır)
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
             var newUser = new User
             {
                 Username = dto.Username,
-                PasswordHash = dto.Password, // İdeal olarak hash'lenmeli
+                PasswordHash = hashedPassword, // $2a$11$... şeklinde hash kaydolur
                 Role = "User"
             };
 
