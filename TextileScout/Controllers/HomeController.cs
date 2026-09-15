@@ -29,22 +29,12 @@ namespace TextileScout.Web.Controllers
 
         public async Task<IActionResult> Index(string? site, string? timeRange, int page = 1)
         {
-            // Giriş yapan kullanıcının ID'sini alıyoruz
             int userId = CurrentUserId;
 
-            if (userId == 0)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
+            // 1. Kullanıcıya ait ve henüz onaylanmamış ürünleri çekiyoruz
+            var query = _context.Products.Where(p => p.UserId == userId && !p.IsApproved);
 
-            int pageSize = 12;
-
-            // 1. Sadece giriş yapan kullanıcının henüz onaylanmamış ürünleri
-            var query = _context.Products
-                .Where(p => p.UserId == userId && !p.IsApproved)
-                .AsQueryable();
-
-            // 2. Marka / Site Filtresi
+            // 2. Marka (Site) Filtresi
             if (!string.IsNullOrEmpty(site))
             {
                 query = query.Where(p => p.SourceSite == site);
@@ -52,40 +42,26 @@ namespace TextileScout.Web.Controllers
 
             // 3. Zaman Filtresi
             if (timeRange == "24h")
-            {
-                query = query.Where(p => p.DetectedAt >= DateTime.Now.AddHours(-24));
-            }
+                query = query.Where(p => p.DetectedAt >= DateTime.Now.AddDays(-1));
             else if (timeRange == "7d")
-            {
                 query = query.Where(p => p.DetectedAt >= DateTime.Now.AddDays(-7));
-            }
 
-            // Sayfalama Hesabı
-            int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            var products = await query.OrderByDescending(p => p.DetectedAt).ToListAsync();
 
-            var products = await query
-                .OrderByDescending(p => p.DetectedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            // DÜZELTİLEN KISIM: Sadece GİRİŞ YAPAN KULLANICININ aktif markaları geliyor!
+            // 4. Kullanıcının takip ettiği marka listesi (Dropdown için)
             var availableSites = await _context.TargetSites
-                .Where(s => s.UserId == userId && s.IsActive)
-                .Select(s => s.Name)
-                .Distinct()
-                .ToListAsync();
+                                            .Where(s => s.UserId == userId)
+                                            .Select(s => s.Name)
+                                            .Distinct()
+                                            .ToListAsync();
 
+            // 5. View'ın beklediği modeli oluşturup gönderiyoruz
             var viewModel = new ProductListViewModel
             {
                 Products = products,
                 SelectedSite = site,
                 TimeRange = timeRange,
-                AvailableSites = availableSites,
-                CurrentPage = page,
-                TotalPages = totalPages,
-                PageSize = pageSize
+                AvailableSites = availableSites
             };
 
             return View(viewModel);

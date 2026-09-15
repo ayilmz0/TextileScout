@@ -9,6 +9,7 @@
         public DateTime DetectedAt { get; set; } = DateTime.Now;
         public bool IsApproved { get; set; } = false;
         public string Status { get; set; } = "InReview";
+        public string? ProductUrl { get; set; }
 
         // MÜLKİYET İLİŞKİSİ
         public int UserId { get; set; }

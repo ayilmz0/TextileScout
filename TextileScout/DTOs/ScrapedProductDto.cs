@@ -4,6 +4,7 @@
     {
         public string SourceUrl { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
+        public string OriginalUrl { get; set; } = string.Empty;
         public string SourceSite { get; set; } = string.Empty;
     }
 }
