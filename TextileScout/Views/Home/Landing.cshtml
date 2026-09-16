@@ -1,0 +1,448 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TextileScout | Yapay Zeka Destekli Moda Nöbetçisi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body, html {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #0f172a;
+                color: #f8fafc;
+                overflow-x: hidden;
+            }
+
+            /* Hero & Slider Section */
+            .hero-section {
+                position: relative;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+            }
+
+            .bg-slider {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+            }
+
+            .bg-slide {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+                opacity: 0;
+                transform: scale(1.08);
+                transition: opacity 1.5s ease-in-out, transform 6s ease;
+            }
+
+                .bg-slide.active {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+
+            .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.6) 100%);
+                z-index: 2;
+            }
+
+            /* Modern Navbar */
+            .navbar-custom {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 25px 50px;
+                z-index: 3;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .brand-logo {
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: #fff;
+                text-decoration: none;
+            }
+
+                .brand-logo span {
+                    color: #10b981;
+                }
+
+            .btn-login {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: #fff;
+                padding: 10px 28px;
+                border-radius: 30px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+                .btn-login:hover {
+                    background: #10b981;
+                    border-color: #10b981;
+                    color: #fff;
+                    transform: translateY(-2px);
+                }
+
+            /* 1. Hero Content İç Boşluklarını Ve Başlık Boyutunu Dengeliyoruz */
+            .hero-content {
+                position: relative;
+                z-index: 3;
+                text-align: center;
+                max-width: 900px;
+                padding: 90px 20px 30px 20px; /* Üst ve alt boşluklar azaltıldı */
+            }
+
+            /* 2. Başlık ve Açıklama Boyutlarını Optimize Ediyoruz */
+            .hero-badge {
+                margin-bottom: 12px;
+            }
+
+            .hero-title {
+                font-size: 2.8rem; /* 3.5rem'den 2.8rem'e çekildi */
+                font-weight: 800;
+                line-height: 1.2;
+                margin-bottom: 15px;
+            }
+
+            .hero-subtitle {
+                font-size: 1.05rem; /* Yazı boyutu dengelendi */
+                color: #cbd5e1;
+                margin-bottom: 25px;
+            }
+
+            /* 3. Buton ve Kartların Marjinlerini Sıkılaştırıyoruz */
+            .feature-cards {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                flex-wrap: wrap;
+                margin-top: 25px; /* Üst boşluk düşürüldü */
+            }
+
+            .f-card {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 18px; /* Kart içi padding küçültüldü */
+                border-radius: 16px;
+                text-align: left;
+                width: 250px;
+            }
+
+                .f-card i {
+                    font-size: 1.5rem;
+                    color: #10b981;
+                    margin-bottom: 8px;
+                }
+
+                .f-card h6 {
+                    font-weight: 600;
+                    font-size: 1rem;
+                    margin-bottom: 4px;
+                }
+
+                .f-card p {
+                    font-size: 0.85rem;
+                    color: #94a3b8;
+                    margin: 0;
+                }
+
+            /* Section Styling */
+            .section-padding {
+                padding: 90px 20px;
+                position: relative;
+                z-index: 3;
+            }
+
+            .section-title {
+                text-align: center;
+                margin-bottom: 60px;
+            }
+
+                .section-title h2 {
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                }
+
+                .section-title p {
+                    color: #94a3b8;
+                    font-size: 1.1rem;
+                }
+
+            /* Stats Section */
+            .stat-box {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 20px;
+                padding: 40px 20px;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 3rem;
+                font-weight: 800;
+                color: #10b981;
+            }
+
+            .stat-label {
+                color: #94a3b8;
+                font-weight: 600;
+                margin-top: 5px;
+            }
+
+            /* Step Section */
+            .step-card {
+                background: #1e293b;
+                border-radius: 16px;
+                padding: 30px;
+                border: 1px solid #334155;
+                position: relative;
+                height: 100%;
+            }
+
+            .step-number {
+                position: absolute;
+                top: -15px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+                background: #10b981;
+                color: #fff;
+                font-weight: 800;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+            }
+
+            /* FAQ Accordion */
+            .accordion-item {
+                background: #1e293b;
+                border: 1px solid #334155;
+                color: #fff;
+                margin-bottom: 15px;
+                border-radius: 12px !important;
+                overflow: hidden;
+            }
+
+            .accordion-button {
+                background: #1e293b;
+                color: #fff;
+                font-weight: 600;
+                box-shadow: none !important;
+            }
+
+                .accordion-button:not(.collapsed) {
+                    background: #334155;
+                    color: #10b981;
+                }
+
+            .accordion-body {
+                color: #94a3b8;
+            }
+
+            footer {
+                border-top: 1px solid #334155;
+                padding: 30px 0;
+                text-align: center;
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <div class="hero-section">
+        <div class="bg-slider">
+            <div class="bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920');"></div>
+            <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1920');"></div>
+            <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1920');"></div>
+        </div>
+        <div class="overlay"></div>
+
+        <nav class="navbar-custom">
+            <a href="#" class="brand-logo"><i class="fa-solid fa-eye me-2"></i>Textile<span>Scout</span></a>
+        </nav>
+
+        <div class="hero-content">
+            <span class="hero-badge"><i class="fa-solid fa-robot me-2"></i>Yapay Zeka Destekli Moda Nöbetçisi</span>
+            <h1 class="hero-title">Rakiplerinizin Yeni Modellerini Anında Yakalayın</h1>
+            <p class="hero-subtitle">E-ticaret sitelerini 7/24 kesintisiz tarayan, YOLOv8 vizyon teknolojisiyle afişleri eleyip sadece kıyafet modellerini sunan akıllı otomasyon.</p>
+
+            <a href="/Auth/Login" class="btn btn-success btn-lg px-5 py-3 rounded-pill fw-bold shadow mb-4">
+                Sisteme Giriş Yap <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+
+            <div class="feature-cards">
+                <div class="f-card">
+                    <i class="fa-solid fa-spider"></i>
+                    <h6>Otomatik Scraping</h6>
+                    <p>PuppeteerSharp ile sitelerdeki tüm görsel değişimlerini anlık izler.</p>
+                </div>
+                <div class="f-card">
+                    <i class="fa-solid fa-brain"></i>
+                    <h6>YOLOv8 AI Filtre</h6>
+                    <p>Afiş, logo ve banner içeriklerini çöpe atar, modele odaklanır.</p>
+                </div>
+                <div class="f-card">
+                    <i class="fa-solid fa-filter"></i>
+                    <h6>Deduplikasyon</h6>
+                    <p>Aynı görselleri tekrar tekrar karşınıza çıkarmaz, aktiftir.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- İSTATİSTİK BÖLÜMÜ -->
+    <section class="section-padding bg-slate-900">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <div class="stat-number">%99.2</div>
+                        <div class="stat-label">AI Doğruluk Oranı</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <div class="stat-number">15 Dk</div>
+                        <div class="stat-label">Tarama Sıklığı</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <div class="stat-number">0 Hata</div>
+                        <div class="stat-label">Tekrarlayan Görsel</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <div class="stat-number">7/24</div>
+                        <div class="stat-label">Canlı Nöbet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NASIL ÇALIŞIR BÖLÜMÜ -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title">
+                <h2>Nasıl Çalışır?</h2>
+                <p>Üç adımda rakiplerinizin vitrinine hakim olun.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <i class="fa-solid fa-link text-success fs-2 mb-3"></i>
+                        <h4>Hedef Adresi Ekleyin</h4>
+                        <p class="text-secondary mt-2">Takip etmek istediğiniz e-ticaret sitesinin veya doğrudan kategori linkini sisteme tanımlayın.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <i class="fa-solid fa-microchip text-success fs-2 mb-3"></i>
+                        <h4>Yapay Zeka Süzgeci</h4>
+                        <p class="text-secondary mt-2">Arka plan servisleri yeni görselleri indirir, YOLOv8 modelleri afişleri eler ve ürün görsellerini filtreler.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <i class="fa-solid fa-circle-check text-success fs-2 mb-3"></i>
+                        <h4>Onaylayın & İnceleyin</h4>
+                        <p class="text-secondary mt-2">Sadece yeni eklenen modeller panelinize düşer. İnceleyip tek tıkla arşivinize alabilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SSS BÖLÜMÜ -->
+    <section class="section-padding bg-slate-900">
+        <div class="container" style="max-width: 800px;">
+            <div class="section-title">
+                <h2>Sıkça Sorulan Sorular</h2>
+            </div>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Sistem aynı resimleri tekrar tekrar gösterir mi?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Hayır. Veritabanında benzersiz görsel kontrolü (OriginalUrl Scout) bulunmaktadır. Sistem daha önce kaydettiği görselleri atlar ve sadece web sitesine YENİ eklenen modelleri bildirir.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Afiş ve reklam fotoğrafları panele düşer mi?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            YOLOv8 yapay zeka vision entegrasyonumuz sayesinde en boy oranı uyumsuz afişler ve insan/kıyafet barındırmayan tasarımlar otomatik olarak elenip silinir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 TextileScout AI. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+            const slides = document.querySelectorAll('.bg-slide');
+            let currentSlide = 0;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 5000);
+    </script>
+</body>
+</html>

@@ -1,29 +1,40 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 
 namespace TextileScout.Web.Services
 {
     public class TokenService
     {
-        private const string JwtKey = "TextileScout_Gizli_Ve_Cok_Uzun_Bir_Sifre_Key_123456!";
+        private readonly IConfiguration _configuration;
+
+        public TokenService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         // 1. KISA ÖMÜRLÜ ACCESS TOKEN (15 Dakika)
         public string GenerateAccessToken(int userId, string username, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(JwtKey);
+
+            // appsettings.json veya User Secrets içerisinden anahtarı güvenle okur
+            var jwtKey = _configuration["JwtSettings:Key"]
+                         ?? throw new InvalidOperationException("JWT Secret Key (JwtSettings:Key) yapılandırmada bulunamadı!");
+
+            var key = Encoding.UTF8.GetBytes(jwtKey);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // USER ID CLAIM
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
-        }),
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()), // USER ID CLAIM
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, role)
+                }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

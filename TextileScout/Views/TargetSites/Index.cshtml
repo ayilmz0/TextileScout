@@ -3,49 +3,64 @@
     ViewData["Title"] = "Takip Edilen Siteler";
 }
 
+<div class="dashboard-hero mb-4 rounded-4 overflow-hidden position-relative shadow-lg p-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+    <span class="badge rounded-pill mb-2 px-3 py-1.5 fw-semibold" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+        <i class="fa-solid fa-globe me-1"></i> Otomasyon Kaynakları
+    </span>
+    <h3 class="fw-bold text-white mb-1">Hedef Site Yönetimi</h3>
+    <p class="text-light opacity-75 mb-0 small">Sistemin 7/24 tarayarak yeni modeller arayacağı e-ticaret bağlantılarını yönetin.</p>
+</div>
+
 <div class="row g-4 justify-content-center">
-    <!-- Sol: Form -->
+    
+    <!-- Sol Form -->
     <div class="col-lg-4">
-        <div class="ts-card p-4">
-            <h6 class="fw-bold mb-1">Yeni Site Ekle</h6>
-            <p class="text-muted small mb-3">Taranmasını istediğiniz adresi tanımlayın</p>
+        <div class="card border-0 p-4 rounded-4 shadow-lg h-100" style="background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12) !important;">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="fa-solid fa-folder-plus text-success fs-5"></i>
+                <h5 class="fw-bold text-white mb-0">Yeni Site Ekle</h5>
+            </div>
+            <p class="text-light opacity-75 small mb-4">Taranmasını istediğiniz adresi tanımlayın</p>
 
             <form asp-action="Create" method="post">
                 <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Site / Marka İsmi</label>
-                    <input type="text" name="name" class="form-control ts-input" placeholder="Örn: Zara Erkek Mont" required />
+                    <label class="form-label small fw-semibold text-light opacity-90">Site / Marka İsmi</label>
+                    <input type="text" name="name" class="form-control text-white" placeholder="Örn: Onuk Giyim" required autocomplete="off" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); padding: 11px 14px; border-radius: 10px;" />
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Hedef URL</label>
-                    <input type="url" name="url" class="form-control ts-input" placeholder="https://..." required />
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-light opacity-90">Hedef URL</label>
+                    <input type="url" name="url" class="form-control text-white" placeholder="https://www.site.com/kategori" required autocomplete="off" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); padding: 11px 14px; border-radius: 10px;" />
                 </div>
-                <button type="submit" class="ts-btn-primary w-100 mt-2">
-                    <i class="bi bi-plus-lg me-1"></i> Takiplere Ekle
+                <button type="submit" class="btn w-100 py-2.5 fw-semibold rounded-3 text-white shadow" style="background: #10b981; border: none;">
+                    <i class="fa-solid fa-plus me-1"></i> Takiplere Ekle
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Sağ: Liste -->
-    <div class="col-lg-7">
-        <div class="ts-card p-4">
-            <h6 class="fw-bold mb-1">Takipteki Siteler</h6>
-            <p class="text-muted small mb-3">Sistemin düzenli olarak kontrol ettiği adresler</p>
+    <!-- Sağ Liste -->
+    <div class="col-lg-8">
+        <div class="card border-0 p-4 rounded-4 shadow-lg h-100" style="background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12) !important;">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="fa-solid fa-list-check text-success fs-5"></i>
+                <h5 class="fw-bold text-white mb-0">Takipteki Siteler</h5>
+            </div>
+            <p class="text-light opacity-75 small mb-4">Sistemin düzenli aralıklarla kontrol ettiği aktif adresler</p>
 
-            <div class="d-flex flex-column gap-2">
+            <div class="d-flex flex-column gap-3">
                 @foreach (var site in Model)
                 {
-                    <div class="p-3 border rounded-3 d-flex align-items-center justify-content-between bg-white">
+                    <div class="p-3.5 rounded-3 d-flex align-items-center justify-content-between shadow-sm" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08);">
                         <div class="overflow-hidden me-3">
-                            <div class="fw-semibold text-dark text-truncate">@site.Name</div>
-                            <a href="@site.Url" target="_blank" class="text-muted small text-decoration-none text-truncate d-block">
-                                @site.Url <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.7rem;"></i>
+                            <div class="fw-bold text-white text-truncate mb-1 fs-6">@site.Name</div>
+                            <a href="@site.Url" target="_blank" class="text-light opacity-75 small text-decoration-none text-truncate d-block" style="transition: color 0.2s;" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
+                                @site.Url <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.7rem;"></i>
                             </a>
                         </div>
                         <form asp-action="Delete" method="post" class="m-0">
                             <input type="hidden" name="id" value="@site.Id" />
-                            <button type="submit" class="btn btn-light text-danger btn-sm rounded-2 border">
-                                <i class="bi bi-trash"></i>
+                            <button type="submit" class="btn btn-sm rounded-3 px-3 py-2" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);" title="Kaldır">
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </form>
                     </div>
@@ -53,11 +68,13 @@
 
                 @if (!Model.Any())
                 {
-                    <div class="text-center py-4 text-muted small">
-                        Henüz kayıtlı bir site yok. Soldaki formdan ekleyebilirsiniz.
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-satellite-dish text-light opacity-25 display-4 mb-3"></i>
+                        <p class="text-light opacity-75 small mb-0">Henüz kayıtlı bir site yok.<br>Soldaki formdan dilediğiniz e-ticaret adresini ekleyebilirsiniz.</p>
                     </div>
                 }
             </div>
         </div>
     </div>
+
 </div>

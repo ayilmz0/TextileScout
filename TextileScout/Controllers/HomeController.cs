@@ -18,6 +18,16 @@ namespace TextileScout.Web.Controllers
             _env = env;
         }
 
+        [AllowAnonymous]
+        public IActionResult Landing()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+
         private int CurrentUserId
         {
             get

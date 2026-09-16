@@ -3,105 +3,121 @@
     ViewData["Title"] = "Gelen Modeller";
 }
 
-<!-- MİKRO ETKİLEŞİMLİ MODERN FİLTRE ÇUBUĞU (z-index DÜZELTİLDİ) -->
-<div class="ts-card p-3 mb-4 position-relative" style="z-index: 1050; overflow: visible;">
-    <form method="get" id="filterForm" class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-
-        <!-- Sol: Başlık ve Model Sayısı -->
-        <div class="d-flex align-items-center gap-2">
-            <h5 class="fw-bold mb-0 text-dark" style="letter-spacing: -0.3px;">Gelen Modeller</h5>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 font-monospace ms-1" style="font-size: 0.75rem;">
-                @Model.Products.Count() Gösteriliyor
+<div class="dashboard-hero mb-4 rounded-4 overflow-hidden position-relative shadow-lg" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+    <!-- Arka plan yapay zeka deseni / ışık efekti -->
+    <div class="position-absolute top-0 end-0 h-100 w-50" style="background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.15), transparent 60%);"></div>
+    
+    <div class="p-4 p-md-5 position-relative z-2 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-4">
+        <div>
+            <span class="badge rounded-pill mb-2 px-3 py-2 fw-semibold" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <i class="fa-solid fa-satellite-dish me-2 pulse-anim"></i>Radar Aktif
             </span>
+            <h3 class="fw-bold text-white mb-2" style="font-size: 2rem;">Gelen Modeller</h3>
+            <p class="text-secondary mb-0" style="font-size: 1.05rem;">Yapay zeka süzgecinden geçen en yeni e-ticaret modelleri sizin için burada listeleniyor.</p>
+        </div>
+        
+        <div class="text-md-end text-start">
+            <div class="display-5 fw-bold text-white mb-1">@Model.Products.Count()</div>
+            <div class="text-secondary font-monospace small">Yeni Model Tespit Edildi</div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 p-3 mb-4 rounded-4 ts-glass-bar" style="z-index: 1050; overflow: visible;">
+    <form method="get" id="filterForm" class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        
+        <div class="d-flex align-items-center gap-2">
+            <div class="icon-box-small">
+                <i class="fa-solid fa-filter"></i>
+            </div>
+            <span class="fw-semibold text-white">Görünümü Filtrele</span>
         </div>
 
-        <!-- Sağ: Buton Tipi Filtreler -->
         <div class="d-flex align-items-center gap-2 flex-wrap position-relative" style="z-index: 1051;">
-
             <!-- Marka Seçimi (Dropdown) -->
             <div class="dropdown">
-                <button class="btn btn-sm btn-light border fw-semibold dropdown-toggle rounded-3 px-3 py-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-building text-muted"></i>
+                <button class="btn ts-btn-glass fw-semibold dropdown-toggle rounded-3 px-3 py-2 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-building text-secondary"></i>
                     <span>@(string.IsNullOrEmpty(Model.SelectedSite) ? "Tüm Markalar" : Model.SelectedSite)</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" style="min-width: 200px; z-index: 1060;">
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 p-2 ts-dropdown-menu" style="min-width: 200px; z-index: 1060;">
                     <li>
                         <a class="dropdown-menu-item @(string.IsNullOrEmpty(Model.SelectedSite) ? "active-item" : "")" href="?site=&timeRange=@Model.TimeRange">
-                            <i class="bi bi-grid-fill me-2"></i>Tüm Markalar
+                            <i class="fa-solid fa-border-all me-2"></i>Tüm Markalar
                         </a>
                     </li>
-                    <li><hr class="dropdown-divider opacity-50"></li>
+                    <li><hr class="dropdown-divider border-secondary opacity-25"></li>
                     @foreach (var s in Model.AvailableSites)
                     {
                         <li>
                             <a class="dropdown-menu-item @(Model.SelectedSite == s ? "active-item" : "")" href="?site=@s&timeRange=@Model.TimeRange">
-                                <i class="bi bi-tag-fill me-2 text-muted"></i>@s
+                                <i class="fa-solid fa-tag me-2 text-secondary"></i>@s
                             </a>
                         </li>
                     }
                 </ul>
             </div>
 
-            <!-- Zaman Aralığı (Hap/Segmented Button) -->
-            <div class="bg-light p-1 rounded-3 border d-flex gap-1">
-                <a href="?site=@Model.SelectedSite&timeRange=all" class="time-pill @(Model.TimeRange == "all" || string.IsNullOrEmpty(Model.TimeRange) ? "active" : "")">
-                    Tümü
-                </a>
-                <a href="?site=@Model.SelectedSite&timeRange=24h" class="time-pill @(Model.TimeRange == "24h" ? "active" : "")">
-                    <i class="bi bi-lightning-charge-fill me-1"></i>Son 24s
-                </a>
-                <a href="?site=@Model.SelectedSite&timeRange=7d" class="time-pill @(Model.TimeRange == "7d" ? "active" : "")">
-                    Son 7 Gün
-                </a>
+            <!-- Zaman Aralığı (Segmented Button) -->
+            <div class="p-1 rounded-3 d-flex gap-1 ts-segment-box">
+                <a href="?site=@Model.SelectedSite&timeRange=all" class="time-pill @(Model.TimeRange == "all" || string.IsNullOrEmpty(Model.TimeRange) ? "active" : "")">Tümü</a>
+                <a href="?site=@Model.SelectedSite&timeRange=24h" class="time-pill @(Model.TimeRange == "24h" ? "active" : "")"><i class="fa-solid fa-bolt me-1 text-warning"></i>24s</a>
+                <a href="?site=@Model.SelectedSite&timeRange=7d" class="time-pill @(Model.TimeRange == "7d" ? "active" : "")">7 Gün</a>
             </div>
-
         </div>
     </form>
 </div>
 
 @if (!Model.Products.Any())
 {
-    <!-- Eğer hiç ürün yoksa boş ekran uyarısı -->
-    <div class="alert alert-light text-center py-5 rounded-4 border-0 shadow-sm mt-4">
-        <i class="bi bi-images display-1 text-muted opacity-25 d-block mb-3"></i>
-        <h5 class="text-muted fw-bold mb-1">Henüz yeni bir model bulunamadı</h5>
-        <p class="text-muted small mb-0">Arka plan servisi çalışıyor, tarama yapıldıkça modeller buraya düşecektir.</p>
+    <div class="card border-0 text-center py-5 rounded-4 shadow-lg ts-glass-card mt-4">
+        <div class="card-body py-5">
+            <div class="radar-scan mx-auto mb-4">
+                <i class="fa-solid fa-radar"></i>
+            </div>
+            <h4 class="text-white fw-bold mb-2">Hedefler Taranıyor</h4>
+            <p class="text-secondary mb-0">Arka plan AI servisi şu an siteleri gözetliyor.<br>Yeni bir model eklendiğinde anında burada görünecektir.</p>
+        </div>
     </div>
 }
 else
 {
-    <!-- Ürünler varsa kartları diz -->
-    <div class="row">
+    <div class="row g-4">
         @foreach (var item in Model.Products)
         {
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden ts-card">
-                    <!-- Resim -->
-                    <img src="@item.ImageUrl" class="card-img-top p-2" alt="@item.SourceSite" style="height: 350px; object-fit: contain; background-color: #f8f9fa;" />
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <!-- PREMİUM MODA KARTI -->
+                <div class="card h-100 border-0 rounded-4 overflow-hidden ts-fashion-card">
+                    
+                    <!-- Görsel Alanı -->
+                    <div class="img-container position-relative">
+                        <!-- Yeni Etiketi -->
+                        <span class="badge new-badge position-absolute top-0 start-0 m-3 z-3">YENİ</span>
+                        <img src="@item.ImageUrl" class="w-100 h-100 ts-img" alt="@item.SourceSite" loading="lazy" />
+                    </div>
 
+                    <!-- Kart Gövdesi -->
                     <div class="card-body d-flex flex-column justify-content-between p-3">
-                        <div>
-                            <h6 class="fw-bold mb-1 text-dark">@item.SourceSite</h6>
-                            <small class="text-muted d-block mb-3">
-                                <i class="bi bi-clock me-1"></i>@item.DetectedAt.ToString("dd.MM.yyyy HH:mm")
-                            </small>
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-1 text-white text-truncate">@item.SourceSite</h6>
+                            <div class="text-secondary small font-monospace d-flex align-items-center">
+                                <i class="fa-regular fa-clock me-1"></i>@item.DetectedAt.ToString("dd.MM.yyyy · HH:mm")
+                            </div>
                         </div>
 
-                        <!-- AKSİYON BUTONLARI -->
-                        <div class="d-flex gap-2 mt-2">
-                            <!-- Beğen (Onayla) Butonu -->
-                            <form asp-controller="Home" asp-action="ApproveProduct" method="post" class="w-50">
+                        <!-- Aksiyon Butonları -->
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Home" asp-action="ApproveProduct" method="post" class="w-50 m-0">
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-success w-100 rounded-3 d-flex align-items-center justify-content-center gap-1">
-                                    <i class="bi bi-heart-fill"></i> Beğen
+                                <button type="submit" class="btn w-100 rounded-3 ts-btn-approve py-2">
+                                    <i class="fa-solid fa-heart me-1"></i> Beğen
                                 </button>
                             </form>
 
-                            <!-- Sil Butonu -->
-                            <form asp-controller="Home" asp-action="DeleteProduct" method="post" class="w-50">
+                            <form asp-controller="Home" asp-action="DeleteProduct" method="post" class="w-50 m-0">
                                 <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger w-100 rounded-3 d-flex align-items-center justify-content-center gap-1">
-                                    <i class="bi bi-trash"></i> Sil
+                                <button type="submit" class="btn w-100 rounded-3 ts-btn-delete py-2">
+                                    <i class="fa-solid fa-trash-can me-1"></i> Sil
                                 </button>
                             </form>
                         </div>
@@ -112,52 +128,47 @@ else
     </div>
 }
 
-<!-- FİLTRE CSS STİLLERİ -->
+<!-- SAYFAYA ÖZEL GÖZ ALICI STİLLER -->
 <style>
-    /* Zaman Butonları (Segmented Control) */
-    .time-pill {
-        padding: 5px 12px;
-        font-size: 0.825rem;
-        font-weight: 600;
-        color: #64748B;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-    }
+    /* Animasyonlar */
+    @@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .pulse-anim { animation: pulse 2s infinite; }
+    
+    @@keyframes scan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .radar-scan { width: 80px; height: 80px; background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #10b981; position: relative; }
+    .radar-scan::after { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; border-top: 3px solid #10b981; animation: scan 2s linear infinite; }
 
-        .time-pill:hover {
-            color: #0F172A;
-        }
+    /* Glassmorphism Temel */
+    .ts-glass-bar, .ts-glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1) !important; }
+    .icon-box-small { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+    
+    /* Filtre Elemanları */
+    .ts-btn-glass { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: #e2e8f0; transition: all 0.2s; }
+    .ts-btn-glass:hover { border-color: #10b981; color: #fff; }
+    .ts-dropdown-menu { background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
+    .dropdown-menu-item { display: flex; align-items: center; padding: 8px 12px; font-size: 0.85rem; color: #cbd5e1; text-decoration: none; border-radius: 6px; transition: all 0.2s; }
+    .dropdown-menu-item:hover { background: rgba(255, 255, 255, 0.05); color: #10b981; }
+    .dropdown-menu-item.active-item { background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 600; }
 
-        .time-pill.active {
-            background: #FFFFFF;
-            color: #2563EB;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
+    .ts-segment-box { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .time-pill { padding: 6px 14px; font-size: 0.825rem; font-weight: 600; color: #94a3b8; text-decoration: none; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; }
+    .time-pill:hover { color: #fff; }
+    .time-pill.active { background: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
 
-    /* Dropdown Eleman Stilleri */
-    .dropdown-menu-item {
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #334155;
-        text-decoration: none;
-        border-radius: 6px;
-        transition: background 0.15s ease;
-    }
+    /* Moda Kartları */
+    .ts-fashion-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .ts-fashion-card:hover { transform: translateY(-8px); border-color: rgba(16, 185, 129, 0.4) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    
+    .img-container { height: 380px; background: #0b1120; overflow: hidden; }
+    .ts-img { object-fit: cover; object-position: top; transition: transform 0.6s ease; }
+    .ts-fashion-card:hover .ts-img { transform: scale(1.06); }
+    
+    .new-badge { background: rgba(16, 185, 129, 0.9); backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); font-size: 0.7rem; letter-spacing: 1px; padding: 6px 10px; }
 
-        .dropdown-menu-item:hover {
-            background: #F1F5F9;
-            color: #2563EB;
-        }
+    /* Aksiyon Butonları */
+    .ts-btn-approve { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600; font-size: 0.85rem; transition: all 0.3s; }
+    .ts-btn-approve:hover { background: #10b981; color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); border-color: #10b981; }
 
-        .dropdown-menu-item.active-item {
-            background: rgba(37, 99, 235, 0.08);
-            color: #2563EB;
-            font-weight: 600;
-        }
+    .ts-btn-delete { background: rgba(239, 68, 68, 0.05); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 600; font-size: 0.85rem; transition: all 0.3s; }
+    .ts-btn-delete:hover { background: rgba(239, 68, 68, 0.9); color: #fff; border-color: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
 </style>
