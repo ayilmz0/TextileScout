@@ -3,12 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Sanal ortam dosyaları (Eğer oluşturduysan)
 venv/
 env/
 .env
 
-# YOLOv8 Yapay Zeka Ağırlık Dosyaları (ÇOK BÜYÜK BOYUTLU OLUR, GITHUB'A ATILMAZ)
 *.pt
 *.onnx
 

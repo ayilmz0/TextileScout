@@ -1,40 +1,174 @@
 ﻿@model TextileScout.Web.DTOs.RegisterDto
 @{
-    Layout = "_Layout"; ViewData["Title"] = "Kayıt Ol";
+    Layout = null;
+    ViewData["Title"] = "Kayıt Ol";
 }
 
-<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-5 col-lg-4">
-        <div class="ts-card p-4 p-md-5">
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | TextileScout</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; overflow: hidden; }
+
+        /* Arka Plan Görsel Slider & Overlay */
+        .login-wrapper {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-slider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .bg-slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; opacity: 0;
+            transform: scale(1.08); transition: opacity 1.5s ease-in-out, transform 6s ease;
+        }
+        .bg-slide.active { opacity: 1; transform: scale(1); }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.75) 100%); z-index: 2; }
+
+        /* Modern Glassmorphism Kart */
+        .login-card {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-logo { font-size: 1.8rem; font-weight: 700; color: #fff; text-decoration: none; }
+        .brand-logo span { color: #10b981; }
+
+        .form-control-dark {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-dark:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: #10b981;
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        }
+
+        .form-control-dark::placeholder { color: #64748b; }
+
+        .btn-submit {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 13px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            color: #fff;
+        }
+
+        .back-home {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            z-index: 4;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .back-home:hover { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <a href="/Home/Landing" class="back-home">
+        <i class="fa-solid fa-arrow-left me-2"></i>Ana Sayfaya Dön
+    </a>
+
+    <div class="login-wrapper">
+        <div class="bg-slider">
+            <div class="bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920');"></div>
+            <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1920');"></div>
+            <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1920');"></div>
+        </div>
+        <div class="overlay"></div>
+
+        <div class="login-card">
             <div class="text-center mb-4">
-                <div class="ts-brand-icon mx-auto mb-3" style="width: 48px; height: 48px;"><i class="bi bi-person-plus fs-5"></i></div>
-                <h5 class="fw-bold mb-1">Hesap Oluştur</h5>
-                <p class="text-muted small mb-0">Kendi rakip radarınızı kurmaya başlayın</p>
+                <div class="mx-auto mb-2" style="width: 48px; height: 48px; display:flex; justify-content:center; align-items:center; background: rgba(16, 185, 129, 0.2); border-radius: 50%; color: #10b981;">
+                    <i class="fa-solid fa-user-plus fs-4"></i>
+                </div>
+                <h5 class="fw-bold mb-1 text-white">Hesap Oluştur</h5>
+                <p class="text-secondary small mb-0">Kendi rakip radarınızı kurmaya başlayın</p>
             </div>
 
             @if (ViewBag.Error != null)
             {
-                <div class="alert alert-danger border-0 rounded-3 small py-2 mb-3">@ViewBag.Error</div>
+                <div class="alert alert-danger border-0 rounded-3 small py-2 mb-4 text-center" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3) !important;">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> @ViewBag.Error
+                </div>
             }
 
             <form asp-action="Register" method="post">
                 <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Kullanıcı Adı</label>
-                    <input asp-for="Username" class="form-control ts-input" required />
+                    <label class="form-label small fw-semibold text-secondary">Kullanıcı Adı</label>
+                    <input asp-for="Username" class="form-control form-control-dark" placeholder="Kullanıcı adı belirleyin" required autocomplete="off" />
                 </div>
+                
                 <div class="mb-3">
-                    <label class="form-label small fw-semibold text-muted">Şifre</label>
-                    <input asp-for="Password" type="password" class="form-control ts-input" required />
+                    <label class="form-label small fw-semibold text-secondary">Şifre</label>
+                    <input asp-for="Password" type="password" class="form-control form-control-dark" placeholder="••••••••" required />
                 </div>
+
                 <div class="mb-4">
-                    <label class="form-label small fw-semibold text-muted">Şifre Tekrar</label>
-                    <input asp-for="ConfirmPassword" type="password" class="form-control ts-input" required />
+                    <label class="form-label small fw-semibold text-secondary">Şifre Tekrar</label>
+                    <input asp-for="ConfirmPassword" type="password" class="form-control form-control-dark" placeholder="••••••••" required />
                 </div>
-                <button type="submit" class="ts-btn-primary w-100 py-2">Kayıt Ol ve Başla</button>
+
+                <button type="submit" class="btn btn-submit w-100 mb-3">
+                    Kayıt Ol ve Başla <i class="fa-solid fa-rocket ms-2"></i>
+                </button>
             </form>
+
             <div class="text-center mt-3">
-                <a asp-action="Login" class="text-decoration-none small text-muted">Zaten hesabınız var mı? <b>Giriş Yap</b></a>
+                <span class="text-secondary small">Zaten hesabınız var mı?</span>
+                <a asp-action="Login" class="text-decoration-none small fw-bold ms-1" style="color: #10b981;">Giriş Yap</a>
             </div>
         </div>
     </div>
-</div>
+
+    <script>
+        const slides = document.querySelectorAll('.bg-slide');
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+    </script>
+</body>
+</html>
