@@ -4,6 +4,13 @@
 * text=auto
 
 ###############################################################################
+# Linguist overrides (Language bar settings)
+###############################################################################
+*.html linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by
