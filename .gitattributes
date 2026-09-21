@@ -4,11 +4,10 @@
 * text=auto
 
 ###############################################################################
-# Linguist overrides (Language bar settings)
+# Ignore Views directory from language statistics
 ###############################################################################
-*.html linguist-vendored
-*.css linguist-vendored
-*.js linguist-vendored
+Views/** linguist-vendored
+*.cshtml linguist-vendored
 
 ###############################################################################
 # Set default behavior for command prompt diff.
