@@ -24,6 +24,13 @@ builder.Services.AddHostedService<AutoScraperBackgroundService>();
 builder.Services.AddScoped<ScraperService>();
 builder.Services.AddScoped<TokenService>();
 
+// Redis Distributed Cache Kaydı
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379";
+    options.InstanceName = "TextileScout_";
+});
+
 // --- 2. POLLY HATA YÖNETİMİ (RETRY POLICY) ---
 // Python API yanıt vermezse veya 5xx hatası dönerse: 3 kez tekrar dene (2sn, 4sn, 8sn bekle)
 builder.Services.AddHttpClient<VisionApiService>()
