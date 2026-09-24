@@ -48,7 +48,7 @@ TextileScout, tekstil üreticileri ve e-ticaret markaları için geliştirilmiş
 ## 📁 Katmanlı Proje Yapısı
 
 ```text
-TextileScout.Web/
+TextileScout/
 ├── Controllers/       # HTTP İsteklerini karşılayan ve Views/JSON dönen yönlendiriciler
 ├── Data/              # AppDbContext ve EF Core Veritabanı konfigürasyonları
 ├── DTOs/              # Veri Taşıma Nesneleri & ViewModel Yapıları
