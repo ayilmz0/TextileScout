@@ -36,9 +36,8 @@ namespace TextileScout.Web.Controllers
                 var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Username, user.Role);
                 var refreshToken = _tokenService.GenerateRefreshToken();
 
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-                await _context.SaveChangesAsync();
+                // Refresh Token'ı veritabanı yerine Redis'e 7 gün süreli kaydediyoruz
+                await _tokenService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
                 SetTokenCookies(accessToken, refreshToken);
                 return RedirectToAction("Index", "Home");
@@ -69,26 +68,24 @@ namespace TextileScout.Web.Controllers
                 return View();
             }
 
-            // BCRYPT İLE ŞİFREYİ HASHLEME (Tuzlama/Salting otomatik yapılır)
+            // BCRYPT İLE ŞİFREYİ HASHLEME
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             var newUser = new User
             {
                 Username = dto.Username,
-                PasswordHash = hashedPassword, // $2a$11$... şeklinde hash kaydolur
+                PasswordHash = hashedPassword,
                 Role = "User"
             };
 
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            // Otomatik Giriş Yaptır
+            // Otomatik Giriş Yaptır & Refresh Token'ı Redis'e yaz
             var accessToken = _tokenService.GenerateAccessToken(newUser.Id, newUser.Username, newUser.Role);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            newUser.RefreshToken = refreshToken;
-            newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            await _context.SaveChangesAsync();
+            await _tokenService.SaveRefreshTokenAsync(newUser.Id, refreshToken);
 
             SetTokenCookies(accessToken, refreshToken);
             return RedirectToAction("Index", "Home");
@@ -109,6 +106,13 @@ namespace TextileScout.Web.Controllers
 
         public async Task<IActionResult> Logout()
         {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                // Redis'teki Refresh Token'ı silip geçersiz kılıyoruz
+                await _tokenService.RevokeRefreshTokenAsync(userId);
+            }
+
             Response.Cookies.Delete("X-Access-Token");
             Response.Cookies.Delete("X-Refresh-Token");
             return RedirectToAction("Login");
@@ -116,8 +120,21 @@ namespace TextileScout.Web.Controllers
 
         private void SetTokenCookies(string accessToken, string refreshToken)
         {
-            Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddMinutes(15) });
-            Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddDays(7) });
+            Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
+
+            Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
         }
     }
 }
