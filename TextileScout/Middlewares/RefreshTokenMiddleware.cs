@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TextileScout.Web.Data;
+using TextileScout.Web.Services;
 
-namespace TextileScout.Web.Services
+namespace TextileScout.Middlewares
 {
     public class RefreshTokenMiddleware
     {

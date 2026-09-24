@@ -5,7 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
+using StackExchange.Redis;
 using System.Text;
+using TextileScout.Middlewares;
+using TextileScout.Web.Middlewares;
 using TextileScout.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +26,17 @@ builder.Host.UseSerilog();
 builder.Services.AddHostedService<AutoScraperBackgroundService>();
 builder.Services.AddScoped<ScraperService>();
 builder.Services.AddScoped<TokenService>();
+
+// Redis Distributed Cache Kaydı
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379";
+    options.InstanceName = "TextileScout_";
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection") ?? "localhost:6379"));
+builder.Services.AddScoped<RedisQueueService>();
 
 // --- 2. POLLY HATA YÖNETİMİ (RETRY POLICY) ---
 // Python API yanıt vermezse veya 5xx hatası dönerse: 3 kez tekrar dene (2sn, 4sn, 8sn bekle)
@@ -78,6 +92,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseMiddleware<RateLimitationMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

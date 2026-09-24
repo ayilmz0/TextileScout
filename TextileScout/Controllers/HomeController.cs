@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 using TextileScout.Web.Data;
 using TextileScout.Web.DTOs;
 
@@ -11,11 +13,13 @@ namespace TextileScout.Web.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly IDistributedCache _cache;
 
-        public HomeController(AppDbContext context, IWebHostEnvironment env)
+        public HomeController(AppDbContext context, IWebHostEnvironment env, IDistributedCache cache)
         {
             _context = context;
             _env = env;
+            _cache = cache;
         }
 
         [AllowAnonymous]
@@ -41,16 +45,28 @@ namespace TextileScout.Web.Controllers
         {
             int userId = CurrentUserId;
 
-            // 1. Kullanıcıya ait ve henüz onaylanmamış ürünleri çekiyoruz
+            // 1. Her kullanıcı, filtre ve sayfa kombinasyonuna özel benzersiz Cache Key
+            string cacheKey = $"user_{userId}_index_site_{site ?? "all"}_time_{timeRange ?? "all"}_page_{page}";
+
+            // 2. Önce Redis Cache kontrolü
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                var cachedModel = JsonSerializer.Deserialize<ProductListViewModel>(cachedData);
+                if (cachedModel != null)
+                {
+                    return View(cachedModel);
+                }
+            }
+
+            // 3. Cache yoksa SQL Server'dan sorgulama
             var query = _context.Products.Where(p => p.UserId == userId && !p.IsApproved);
 
-            // 2. Marka (Site) Filtresi
             if (!string.IsNullOrEmpty(site))
             {
                 query = query.Where(p => p.SourceSite == site);
             }
 
-            // 3. Zaman Filtresi
             if (timeRange == "24h")
                 query = query.Where(p => p.DetectedAt >= DateTime.Now.AddDays(-1));
             else if (timeRange == "7d")
@@ -58,14 +74,12 @@ namespace TextileScout.Web.Controllers
 
             var products = await query.OrderByDescending(p => p.DetectedAt).ToListAsync();
 
-            // 4. Kullanıcının takip ettiği marka listesi (Dropdown için)
             var availableSites = await _context.TargetSites
                                             .Where(s => s.UserId == userId)
                                             .Select(s => s.Name)
                                             .Distinct()
                                             .ToListAsync();
 
-            // 5. View'ın beklediği modeli oluşturup gönderiyoruz
             var viewModel = new ProductListViewModel
             {
                 Products = products,
@@ -74,13 +88,33 @@ namespace TextileScout.Web.Controllers
                 AvailableSites = availableSites
             };
 
+            // 4. Sonucu 3 dakikalığına Redis'e yazma
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(viewModel), cacheOptions);
+
             return View(viewModel);
         }
 
         public async Task<IActionResult> Approved(int page = 1)
         {
+            int userId = CurrentUserId;
+            string cacheKey = $"user_{userId}_approved_page_{page}";
+
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                var cachedModel = JsonSerializer.Deserialize<ProductListViewModel>(cachedData);
+                if (cachedModel != null)
+                {
+                    return View(cachedModel);
+                }
+            }
+
             int pageSize = 12;
-            var query = _context.Products.Where(p => p.IsApproved);
+            var query = _context.Products.Where(p => p.UserId == userId && p.IsApproved);
 
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -99,6 +133,12 @@ namespace TextileScout.Web.Controllers
                 PageSize = pageSize
             };
 
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(viewModel), cacheOptions);
+
             return View(viewModel);
         }
 
@@ -111,13 +151,15 @@ namespace TextileScout.Web.Controllers
                 product.IsApproved = true;
                 product.Status = "Approved";
                 await _context.SaveChangesAsync();
+
+                await ClearUserProductsCache();
             }
 
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteProduct(int id, string returnUrl)
+        public async Task<IActionResult> DeleteProduct(int id, string? returnUrl)
         {
             var product = await _context.Products.FindAsync(id);
             if (product != null)
@@ -133,6 +175,8 @@ namespace TextileScout.Web.Controllers
 
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
+
+                await ClearUserProductsCache();
             }
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -141,6 +185,14 @@ namespace TextileScout.Web.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        // Kullanıcı bir değişiklik yaptığında bayat verileri temizleyen yardımcı metod
+        private async Task ClearUserProductsCache()
+        {
+            int userId = CurrentUserId;
+            await _cache.RemoveAsync($"user_{userId}_index_site_all_time_all_page_1");
+            await _cache.RemoveAsync($"user_{userId}_approved_page_1");
         }
     }
 }
